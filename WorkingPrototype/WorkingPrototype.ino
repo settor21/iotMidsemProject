@@ -1,4 +1,10 @@
 #include <LiquidCrystal_I2C.h>
+#include <WiFi.h>
+#include <WiFiMulti.h>
+#include <HTTPClient.h>
+#define USE_SERIAL Serial
+
+WiFiMulti wifiMulti;
 
 #define TRIG_PIN 33 // ESP32 pin GIOP35 connected to Ultrasonic Sensor's TRIG pin
 #define ECHO_PIN 34 // ESP32 pin GIOP33 connected to Ultrasonic Sensor's ECHO pin
@@ -13,7 +19,12 @@ float duration_us, distance_cm,Water_level;
 
 void setup() {
   // begin serial port
-  Serial.begin (115200);
+  Serial.begin (115200); 
+
+  // initialize the lcd 
+  lcd.init();                       
+  lcd.clear();
+  lcd.backlight();
 
   // configure the trigger pin to output mode
   pinMode(TRIG_PIN, OUTPUT);
@@ -22,12 +33,17 @@ void setup() {
   // configure the echo pin to input mode
   pinMode(LED_PIN, OUTPUT);
 
-  lcd.init();                      // initialize the lcd 
-  lcd.clear();
-  lcd.backlight();
+
+     for(uint8_t t = 4; t > 0; t--) {
+        Serial.printf("[SETUP] WAIT %d...\n", t);
+        Serial.flush();
+        delay(1000);
+  
   }
 
-void loop() {
+  wifiMulti.addAP("GS10","ftel3849");
+}
+void loop() {  
   // generate 10-microsecond pulse to TRIG pin
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
@@ -60,7 +76,35 @@ void loop() {
   Serial.print(Water_level);
   Serial.println(" cm");
 
+  if((wifiMulti.run() == WL_CONNECTED)) {
+
+        HTTPClient http;
+
+        Serial.print("[HTTP] begin...\n");
+        // configure traged server and url
+        //http.begin("https://www.howsmyssl.com/a/check", ca); //HTTPS
+        http.begin("http://192.168.213.165/IoT/Project_uche.php?Water_level="+String(Water_level)); //HTTP
   
+        Serial.print("[HTTP] GET...\n");
+        // start connection and send HTTP header
+        int httpCode = http.GET();
+        //Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+        // httpCode will be negative on error
+        if(httpCode > 0) {
+            // HTTP header has been send and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+            // file found at server
+            if(httpCode == HTTP_CODE_OK) {
+                String payload = http.getString();
+                //Serial.println(payload);
+            }
+        } else {
+            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+
+        http.end();
+    }
   
   delay(1500);
 }
