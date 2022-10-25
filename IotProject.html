@@ -28,11 +28,17 @@
 	<h2>Rooftop </h2>
 	</div>
 	HTML ! -->
-<button class="button-2" role="button" name="rooftop">Rooftop</button>
+
+<button class="button-2" role="button" name="rooftop" onclick="updateByAJAX_tankdbData()">Rooftop</button>
+<p> Last 5 water levels in Rooftop tank: </p>
+<div id="tankdbData"></div>
+
 <br>
 <br>
 
-<button class="button-3" role="button" name="charlotte">Charlotte</button>
+<button class="button-3" role="button" name="charlotte" onclick="updateByAJAX_charlotteData()">Charlotte</button>
+<p> Last 5 water levels in Charlotte tank: </p>
+<div id="charlotteData"></div>
 <!-- 
 	<div button class="sensor">
 	<h2>Charlotte</h2>
@@ -44,6 +50,30 @@
 <!-- HTML !-->
 <button class="button-1" role="button">Auto</button>
 <button class="button-1" role="button">Manual</button>
+
+
+<script type="text/javascript">
+
+function updateByAJAX_tankdbData(){
+			const xhttp=new XMLHttpRequest();
+			xhttp.onload=function(){
+				document.getElementById("tankdbData").innerText=this.responseText;
+			}
+			
+			xhttp.open("GET", "./Retrievinglevel.php");
+			xhttp.send();
+		}
+
+function updateByAJAX_charlotteData(){
+		const xhttp=new XMLHttpRequest();
+		xhttp.onload=function(){
+				document.getElementById("charlotteData").innerText=this.responseText;
+			}
+			
+			xhttp.open("GET", "./RetrieveCharlotte.php");
+			xhttp.send();
+		}
+</script>
 
 
 
