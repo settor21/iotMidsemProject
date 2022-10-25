@@ -2,6 +2,8 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
 #define USE_SERIAL Serial
 
 WiFiMulti wifiMulti;
@@ -16,11 +18,15 @@ WiFiMulti wifiMulti;
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 float duration_us, distance_cm,Water_level;
+const char* ssid = "xx";
+const char* password = "xx";
+
+WebServer server(80);
 
 void setup() {
   // begin serial port
   Serial.begin (115200); 
-
+  WiFi.mode(WIFI_STA);
   // initialize the lcd 
   lcd.init();                       
   lcd.clear();
@@ -41,9 +47,25 @@ void setup() {
   
   }
 
-  wifiMulti.addAP("GS10","ftel3849");
+  wifiMulti.addAP("ssid","password");
+  Serial.println("Connecting");
+  while(wifiMulti.run() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("Connected to WiFi network with IP Address: ");
+    Serial.println(WiFi.localIP());
+
+     if (MDNS.begin("esp32")) {    //multicast DNS service
+    Serial.println("MDNS responder started");
+  }
+
+  server.on("/", baseHandle );
 }
 void loop() {  
+  server.handleClient();
+  delay(2);
   // generate 10-microsecond pulse to TRIG pin
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
@@ -75,21 +97,21 @@ void loop() {
   Serial.print("Water level: ");
   Serial.print(Water_level);
   Serial.println(" cm");
+  GET_RQ();
+}
 
+void GET_RQ(){
   if((wifiMulti.run() == WL_CONNECTED)) {
 
         HTTPClient http;
 
         Serial.print("[HTTP] begin...\n");
         // configure traged server and url
-        //http.begin("https://www.howsmyssl.com/a/check", ca); //HTTPS
         http.begin("http://192.168.213.165/IoT/Project_uche.php?Water_level="+String(Water_level)); //HTTP
   
         Serial.print("[HTTP] GET...\n");
         // start connection and send HTTP header
         int httpCode = http.GET();
-        //Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-        // httpCode will be negative on error
         if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
             Serial.printf("[HTTP] GET... code: %d\n", httpCode);
@@ -97,7 +119,7 @@ void loop() {
             // file found at server
             if(httpCode == HTTP_CODE_OK) {
                 String payload = http.getString();
-                //Serial.println(payload);
+                Serial.println(payload);
             }
         } else {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -107,4 +129,25 @@ void loop() {
     }
   
   delay(1500);
-}
+ }
+
+void handleNotFound(){
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+  }
+
+
+  void baseHandle(){
+    
+    server.send(200, "text/plain","hello from esp32");
+    }
