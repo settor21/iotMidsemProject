@@ -6,7 +6,7 @@
 #include <ESPmDNS.h>
 #define USE_SERIAL Serial
 
-WiFiMulti wifiMulti;
+//WiFiMulti wifiMulti;
 
 #define TRIG_PIN 33 // ESP32 pin GIOP35 connected to Ultrasonic Sensor's TRIG pin
 #define ECHO_PIN 34 // ESP32 pin GIOP33 connected to Ultrasonic Sensor's ECHO pin
@@ -14,13 +14,11 @@ WiFiMulti wifiMulti;
 #define SDA_PIN 21 // SDA pin for LCD
 #define SCL_PIN 22 // SCL pin for LCD
 
-
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-
 float duration_us, distance_cm,Water_level;
-const char* ssid = "nonfungible";
-const char* password = "20012023";
-const int relay = 26;
+const char* ssid = "Shiru";
+const char* password = "12345678";
+
 WebServer server(80);
 
 void handleNotFound(){
@@ -32,6 +30,7 @@ void handleNotFound(){
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
+  
   for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
@@ -44,11 +43,13 @@ void handleNotFound(){
     server.send(200, "text/plain","hello from esp32");
     }
     
+    
 void setup() {
   // begin serial port
   Serial.begin (115200); 
-  pinMode(relay, OUTPUT);
+  //pinMode(relay, OUTPUT);
   WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid,password);
   // initialize the lcd 
   lcd.init();                       
   lcd.clear();
@@ -69,15 +70,15 @@ void setup() {
   
   }
 
-  wifiMulti.addAP("ssid","password");
-//  Serial.println("Connecting");
-//  while(wifiMulti.run() != WL_CONNECTED){
-//    delay(500);
-//    Serial.print(".");
-//    }
-//    Serial.println("");
-//    Serial.print("Connected to WiFi network with IP Address: ");
-//    Serial.println(WiFi.localIP());
+  //wifiMulti.addAP("ssid","password");
+  Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("Connected to WiFi network with IP Address: ");
+    Serial.println(WiFi.localIP());
 
      if (MDNS.begin("esp32")) {    //multicast DNS service
     Serial.println("MDNS responder started");
@@ -128,29 +129,34 @@ void loop(void) {
   Serial.print("Water level: ");
   Serial.print(Water_level);
   Serial.println(" cm");
+  delay(2000);
+  //GET_RQ();
 
 
-// Normally Open configuration, send LOW signal to let current flow
-// (if you're usong Normally Closed configuration send HIGH signal)
-
-digitalWrite(relay, LOW);
-Serial.println("Current Flowing");
-delay(5000); 
-
-// Normally Open configuration, send HIGH signal stop current flow
-// (if you're usong Normally Closed configuration send LOW signal)
-digitalWrite(relay, HIGH);
-Serial.println("Current not Flowing");
-delay(5000);
-} 
+//// Normally Open configuration, send LOW signal to let current flow
+//// (if you're usong Normally Closed configuration send HIGH signal)
+//
+//digitalWrite(relay, LOW);
+//Serial.println("Current Flowing");
+//delay(5000); 
+//
+//// Normally Open configuration, send HIGH signal stop current flow
+//// (if you're usong Normally Closed configuration send LOW signal)
+//digitalWrite(relay, HIGH);
+//Serial.println("Current not Flowing");
+//delay(5000);
+}
+String serverName = "http://192.168.137.166/IoT/Project_uche.php?"; 
 void GET_RQ(){
-  if((wifiMulti.run() == WL_CONNECTED)) {
+  if((WiFi.status() == WL_CONNECTED)) {
 
         HTTPClient http;
 
         Serial.print("[HTTP] begin...\n");
         // configure traged server and url
-        http.begin("http://192.168.43.240/IoT/Project_uche.php?Water_level="+String(Water_level)); //HTTP
+        String serverPath = serverName + "Water_level="+String(Water_level);
+ 
+        http.begin(serverPath.c_str()); //HTTP
   
         Serial.print("[HTTP] GET...\n");
         // start connection and send HTTP header
@@ -163,6 +169,7 @@ void GET_RQ(){
             if(httpCode == HTTP_CODE_OK) {
                 String payload = http.getString();
                 Serial.println(payload);
+                server.send(200, "text/html", payload);
             }
         } else {
             Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
