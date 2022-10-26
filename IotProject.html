@@ -3,6 +3,11 @@
 <head>
 	<link rel="stylesheet" href="style.css">
 	<title>Monitoring Storage Tank Level</title>
+	<style>
+  
+		.on {background-color:red}
+		.off {background-color:blue}
+		</style></head>
 </head>
 <body>
 	<h1 style="color: blue;">Monitoring Storage Tank Level</h1>
@@ -51,6 +56,25 @@
 <button class="button-1" role="button">Auto</button>
 <button class="button-1" role="button">Manual</button>
 
+<p> Working in Manual mode </p>
+  
+  <table style='width:100%'><tr>
+  <td>Motor State <span id='MotorS'></span></td>
+  </tr></table>
+  
+  <table style='width:100%'><tr>
+  
+       <td><button class = 'btn off' id='Motor'
+     onclick = 'sendData(id)'>Press to turn Motor ON
+     </button></td>
+</tr></table>
+
+
+
+
+
+
+
 
 <script type="text/javascript">
 
@@ -60,7 +84,7 @@ function updateByAJAX_tankdbData(){
 				document.getElementById("tankdbData").innerText=this.responseText;
 			}
 			
-			xhttp.open("GET", "./Retrievinglevel.php");
+			xhttp.open("GET", "http://localhost/iotinhtdocs/midsemproject/iotMidsemProject/Retrievinglevel.php?");
 			xhttp.send();
 		}
 
@@ -70,9 +94,35 @@ function updateByAJAX_charlotteData(){
 				document.getElementById("charlotteData").innerText=this.responseText;
 			}
 			
-			xhttp.open("GET", "./RetrieveCharlotte.php");
+			xhttp.open("GET", "http://localhost/iotinhtdocs/midsemproject/iotMidsemProject/RetrieveCharlotte.php?");
 			xhttp.send();
 		}
+
+
+function sendData(butn)
+{
+  var URL, variab, text;
+  if(butn == 'Motor')
+  {
+    URL = 'Motorurl';
+    variab = 'MotorS';
+  }
+
+  if(butn == 'Motor')
+{ // change button class and text 
+  var state = document.getElementById(butn).className;
+  state = (state == 'btn on' ? 'btn off' : 'btn on');
+  text = (state == 'btn on' ? butn + ' OFF' : butn + ' ON');
+    document.getElementById(butn).className = state;
+    document.getElementById(butn).innerHTML = 'Press to turn ' + text;
+  }
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function(){
+    document.getElementById(variab).innerHTML = this.responseText;
+  }
+  xhr.open('GET', URL, true);
+  xhr.send();
+}
 </script>
 
 
