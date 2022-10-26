@@ -1,2 +1,2 @@
 # iotMidsemProject
-IOT water level system -  webserver pages
+IOT water level system -  Arduino Code + web server pages
