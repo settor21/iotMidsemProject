@@ -1,5 +1,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <WiFi.h>
+#include <ESP32Servo.h>
 #include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <WebServer.h>
@@ -7,17 +8,20 @@
 #define USE_SERIAL Serial
 
 //WiFiMulti wifiMulti;
-
-#define TRIG_PIN 33 // ESP32 pin GIOP35 connected to Ultrasonic Sensor's TRIG pin
-#define ECHO_PIN 34 // ESP32 pin GIOP33 connected to Ultrasonic Sensor's ECHO pin
+Servo myservo;
+#define TRIG_PIN 33 // ESP32 pin GIOP33 connected to Ultrasonic Sensor's TRIG pin
+#define ECHO_PIN 34 // ESP32 pin GIOP34 connected to Ultrasonic Sensor's ECHO pin
 #define LED_PIN  18 // LED pin set on/off based on water level
 #define SDA_PIN 21 // SDA pin for LCD
 #define SCL_PIN 22 // SCL pin for LCD
-
+#define MOTOR_PIN 13 // Motor pin set on/off based on water level
+#define MAX_DIST 10 //centimeters
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 float duration_us, distance_cm,Water_level;
 const char* ssid = "Shiru";
 const char* password = "12345678";
+
+Servo servo;
 
 WebServer server(80);
 
@@ -62,6 +66,10 @@ void setup() {
   // configure the echo pin to input mode
   pinMode(LED_PIN, OUTPUT);
 
+  servo.attach(MOTOR_PIN);
+
+  servo.write(0);
+
 
      for(uint8_t t = 4; t > 0; t--) {
         Serial.printf("[SETUP] WAIT %d...\n", t);
@@ -95,7 +103,7 @@ void setup() {
   server.begin();
   Serial.println("Http server started");
 }
-void loop(void) {  
+void loop(void) {   
   server.handleClient();
   delay(2);
   // generate 10-microsecond pulse to TRIG pin
@@ -110,7 +118,7 @@ void loop(void) {
   distance_cm = 0.017 * duration_us;
 
 
-  Water_level = 10.8-distance_cm;
+  Water_level = MAX_DIST - distance_cm;
   if (Water_level<=2){
     digitalWrite(LED_PIN,HIGH);
   }
@@ -118,6 +126,14 @@ void loop(void) {
   else if (Water_level>=8){
     digitalWrite(LED_PIN,LOW);
   }
+
+  if (Water_level <=2){
+    servo.write(360);
+    }else if(Water_level == MAX_DIST){
+
+      servo.write(0);
+      
+      }
 
   lcd.setCursor(0,0);
   lcd.print("Water Level");
@@ -129,8 +145,7 @@ void loop(void) {
   Serial.print("Water level: ");
   Serial.print(Water_level);
   Serial.println(" cm");
-  delay(2000);
-  //GET_RQ();
+  delay(1500);
 
 
 //// Normally Open configuration, send LOW signal to let current flow
@@ -146,7 +161,7 @@ void loop(void) {
 //Serial.println("Current not Flowing");
 //delay(5000);
 }
-String serverName = "http://192.168.137.166/IoT/Project_uche.php?"; 
+String serverName = "http://192.168.137.166 /IoT/Project_uche.php?"; 
 void GET_RQ(){
   if((WiFi.status() == WL_CONNECTED)) {
 
@@ -180,5 +195,5 @@ void GET_RQ(){
       Serial.println("WiFi Disconnected");
     }
   
-  delay(3000);
+  delay(1500);
  }
