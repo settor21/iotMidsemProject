@@ -13,7 +13,7 @@
  
    if ($q=mysqli_query($con, $sql)) {
     while ($row = $q->fetch_assoc()){
-        echo "{$row['Water_level']}  {$row['Time']} \n". "<br/>";
+        echo "{$row['Water_level']}  {$row['Time']} \n\n\n"; //"<br/>";
     }
    } 
    

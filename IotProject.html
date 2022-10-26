@@ -17,7 +17,7 @@
 	<h1 text-align= "center"> </h1>
 	<p style="font-size: 120%;">This page shows the storage 
 		tanks in each house in Regimanuel Estate. Click any of the tanks to display last 5 water levels.</p>
-    <style>
+    <!-- <style>
 	 .sensor{
 		background-color: violet;
 		color: white;
@@ -29,7 +29,7 @@
 	
 
 
-    </style>
+    </style> -->
 	<body>
 
 <button class="button-2" role="button" name="rooftop" onclick="updateByAJAX_tankdbData()">Rooftop</button>
@@ -59,7 +59,7 @@
 	<!-- <p style="font-size: 120%;"> Click to change mode of operation of motor</p> -->
 
 <!-- HTML !-->
-<!-- <button class="button-1" role="button">Auto</button> -->
+
 <!-- <button class="button-3" role="button">Manual</button> -->
 
 <p style="font-size: 120%;"> Working in Manual mode </p>
@@ -69,6 +69,7 @@
   <td>Motor State <span id='MotorS'></span></td>
   </tr></table>
   
+  <button id= 'manual' class="button-1" role="button"name="Auto" onclick = 'sendData(id)'>Manual mode </button>
   <table style='width:100%'><tr>
 	<!-- <button class="button-3" role="button" id='Motor' onclick="sendData(id)">Press to turn into Manual Mode</button> -->
        <td><button class = 'btn off' id='Motor'
@@ -133,6 +134,12 @@ function sendData(butn)
   {
     URL = 'Motorurl';
     variab = 'MotorS';
+  }
+
+  if(butn == 'manual')
+  {
+    URL = 'manualurl';
+    
   }
 
   if(butn == 'Motor')
