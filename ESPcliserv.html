@@ -63,7 +63,10 @@ function sendData(butn)
     document.getElementById(butn).innerHTML = 'Press to turn ' + text;
   }
   var xhr = new XMLHttpRequest();
-  xhr.onload = function(){
+  xhr.onreadystatechange = function(butn)
+  {
+    if (this.readyState == 4 && this.status == 200)
+//   xhr.onload = function(){
     document.getElementById(variab).innerHTML = this.responseText;
   }
   xhr.open('GET', URL, true);
