@@ -8,8 +8,7 @@
   .btn {font-size:20px; color:black; text-decoration:none}
 		.on {background-color:red}
 		.off {background-color:blue}
-		
-         /* p {font-size:30px; margin-top:50px; margin-bottom:5px} */
+	
 		</style></head>
 </head>
 <body>
@@ -17,61 +16,33 @@
 	<h1 text-align= "center"> </h1>
 	<p style="font-size: 120%;">This page shows the storage 
 		tanks in each house in Regimanuel Estate. Click any of the tanks to display last 5 water levels.</p>
-    <!-- <style>
-	 .sensor{
-		background-color: violet;
-		color: white;
-		border: 1px solid black;
-		margin: 20px;
-		padding: px;
-
-	} 
-	
-
-
-    </style> -->
 	<body>
 
 <button class="button-2" role="button" name="rooftop" onclick="updateByAJAX_tankdbData()">Rooftop</button>
-<p> Last 5 water levels in Rooftop tank: </p>
 <div id="tankdbData"></div>
 
-<button class="button-1" role="button" name="rooftop" onclick="updateByAJAX_Current()">Click to show current water level</button>
-<!-- <p> Last 5 water levels in Rooftop tank: </p> -->
+<button class="button-1" role="button" name="rooftop" onclick="updateByAJAX_Current()">Click to show Rooftop current water level</button>
 <div id="Current"></div>
 
 <br>
 <br>
 
 <button class="button-3" role="button" name="charlotte" onclick="updateByAJAX_charlotteData()">Charlotte</button>
-<p> Last 5 water levels in Charlotte tank: </p>
 <div id="charlotteData"></div>
 
-<button class="button-1" role="button" name="charlotte" onclick="updateByAJAX_CurrT2()">Click to show current water level</button>
-<!-- <p> Last 5 water levels in Rooftop tank: </p> -->
+<button class="button-1" role="button" name="charlotte" onclick="updateByAJAX_CurrT2()">Click to show Charlotte current water level</button>
 <div id="CurrT2"></div>
-<!-- 
-	<div button class="sensor">
-	<h2>Charlotte</h2>
-	</div> -->
+
     <br>
 	<br>
-	<!-- <p style="font-size: 120%;"> Click to change mode of operation of motor</p> -->
-
-<!-- HTML !-->
-
-<!-- <button class="button-3" role="button">Manual</button> -->
-
-<p style="font-size: 120%;"> Working in Manual mode </p>
-<p style="font-size: 120%;"> Click to change mode of operation of motor</p>
+<p style="font-size: 120%;"> Click to select manual mode of operation of motor</p>
   
   <table style='width:100%'><tr>
-  <td>Motor State <span id='MotorS'></span></td>
+  <td> <span id='MotorS'></span></td>
   </tr></table>
   
-  <button id= 'manual' class="button-1" role="button"name="Auto" onclick = 'sendData(id)'>Manual mode </button>
+  <button id= 'manual' class="button-1" role="button"name="Manual" onclick = 'sendData(id)'>Manual mode </button>
   <table style='width:100%'><tr>
-	<!-- <button class="button-3" role="button" id='Motor' onclick="sendData(id)">Press to turn into Manual Mode</button> -->
        <td><button class = 'btn off' id='Motor'
      onclick = 'sendData(id)'>Press to turn Motor ON
      </button></td>
@@ -165,35 +136,6 @@ function sendData(butn)
 
 
 
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
 
 </body>
 
