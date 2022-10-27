@@ -20,8 +20,8 @@ Servo myservo;
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 float duration_us, distance_cm,Water_level;
 int MotorS = LOW;
-const char* ssid = "Shiru";
-const char* password = "12345678";
+const char* ssid = "Galaxy";
+const char* password = "kojowasnothere";
 
 Servo servo;
 
@@ -48,6 +48,17 @@ void handleNotFound(){
     
     server.send(200, "text/plain","hello from esp32");
     }
+
+  void Motorfunct()
+{
+  MotorS = !MotorS;
+  digitalWrite(MOTOR_PIN, MotorS);
+  counter++;
+  String str = "ON";    //very little returned
+  if(MotorS == LOW) str = "OFF";
+  server.send(200, "text/plain", str);
+  Serial.println("red");
+}
     
     
 void setup() {
@@ -105,17 +116,6 @@ void setup() {
   server.begin();
   Serial.println("Http server started");
   server.on("/Motorurl",Motorfunct);
-
-void Motorfunct()
-{
-  MotorS = !MotorS;
-  digitalWrite(MOTOR_PIN, MotorS);
-  counter++;
-  String str = "ON";    //very little returned
-  if(MotorS == LOW) str = "OFF";
-  server.send(200, "text/plain", str);
-  Serial.println("red");
-}
 
 }
 void loop(void) {   
