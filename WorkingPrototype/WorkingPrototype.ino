@@ -235,5 +235,5 @@ void GET_RQ(){
       Serial.println("WiFi Disconnected");
     }
   
-  delay(1500);
+  delay(500);
  }

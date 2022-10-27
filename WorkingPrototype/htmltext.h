@@ -29,7 +29,7 @@ char page[] PROGMEM = R"(
      </button></td>
      
   <td><button class = 'btn off' id='Red LED'
-     onclick = 'sendData(id)'>Press to turn LED ON
+     onclick = 'sendData(id)'>Press to turn MOTOR ON
      </button></td>
 
      
