@@ -38,26 +38,9 @@ char page[] PROGMEM = R"(
   <br>
 <p style="font-size: 120%;"> Click to select manual mode of operation of motor</p>
   
-<table style='width:100%'><tr>
-	<td>Red LED is <span id='LEDR'>OFF</span> now</td>
-	</tr></table>
-	<table style='width:100%'><tr>
-  
-	<td><button class = 'btn off' id='manual'
-	   onclick = 'sendData(id)'>Press to enter manual operation
-	   </button></td>
-  
-  <table style='width:100%'><tr>
-       <td><button class = 'btn off' id='Red LED'
-     onclick = 'sendData(id)'>Press to turn LED ON
-     </button></td>
-</tr></table>
 
-<!-- <table style='width:100%'><tr>
-	<td><button class = 'btn off' id='MotorControl'
-  onclick = 'updateByAJAX_MotorControl()'>Click to control motor
-  </button></td>
-</tr></table> -->
+<a href="http://192.168.137.174" class="button-1">Rooftop Tank Control</a>
+
 
 
 
@@ -108,17 +91,7 @@ function updateByAJAX_charlotteData(){
       xhttp.send();
     }
 
-	// function updateByAJAX_MotorControl(){
-	// var URL;
-	// URL = 'Espaddress';
-    // const xhttp=new XMLHttpRequest();
-    // xhttp.onload=function(){
-    //     document.getElementById("MotorControl").innerText=this.responseText;
-    //   }
-      
-    //   xhttp.open("GET", URL,true);
-    //   xhttp.send();
-    // }
+
 
 	function sendData(butn)
 {
@@ -157,30 +130,6 @@ function updateByAJAX_charlotteData(){
   xhr.send();
 }
 
-
-
-
-
-// function sendIP(butn)
-// {
-//   var URL;
-//   if(butn == 'ControlMotor')
-//   {
-//     URL = 'Controlurl';
- 
-
-//   }
-//   var xhr = new XMLHttpRequest();
-//   xhr.onreadystatechange = function(butn)
-//   {
-//     if (this.readyState == 4 && this.status == 200)
-
-// //   xhr.onload = function(){
-//     document.getElementById(variab).innerHTML = this.responseText;
-//   }
-//   xhr.open('GET', URL, true);
-//   xhr.send();
-// }
 </script>
 
 
