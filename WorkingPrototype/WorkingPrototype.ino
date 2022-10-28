@@ -7,6 +7,9 @@
 #include <ESPmDNS.h>
 
 #define USE_SERIAL Serial
+#define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */  
+#define TIME_TO_SLEEP  15        /* Time ESP32 will go to sleep (in seconds) */      
+RTC_DATA_ATTR int bootCount = 0;   //needed 
 #include "Projectthml.h"
 
 //WiFiMulti wifiMulti;
@@ -17,7 +20,7 @@ Servo myservo;
 #define SDA_PIN 21 // SDA pin for LCD
 #define SCL_PIN 22 // SCL pin for LCD
 #define MOTOR_PIN 13 // Motor pin set on/off based on water level
-#define MAX_DIST 10 //centimeters
+#define MAX_DIST 60 //centimeters
 
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 float duration_us, distance_cm,Water_level;
@@ -30,6 +33,22 @@ int manualState  = LOW;
 Servo servo;
 
 WebServer server(80);
+
+void print_wakeup_reason(){     ///needed
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
+    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  }
+}
 
 void handleNotFound(){
   String message = "File Not Found\n\n";
@@ -74,7 +93,6 @@ void handleNotFound(){
 
 void manualfunct(){
  if(manualState == HIGH){
-// manualState = !manualState
    manualState = LOW;
 }
  else{
@@ -109,11 +127,17 @@ void setup() {
      for(uint8_t t = 4; t > 0; t--) {
         Serial.printf("[SETUP] WAIT %d...\n", t);
         Serial.flush();
-        delay(1000);
+      //  delay(1000);
   
   }
 
   //wifiMulti.addAP("ssid","password");
+  ++bootCount; 
+   print_wakeup_reason();  
+   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
+  " Seconds");
+  
   Serial.println("Connecting");
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
@@ -159,12 +183,12 @@ void loop(void) {
 
   Water_level = MAX_DIST - distance_cm;
  if (manualState == LOW){
- if (Water_level<=2){
+ if (Water_level<=10){
     digitalWrite(LED_PIN,HIGH);
     servo.write(360);
   }
  
-  else if (Water_level>=8){
+  else if (Water_level>=57){
     digitalWrite(LED_PIN,LOW);
     servo.write(0);
   }
@@ -185,21 +209,9 @@ void loop(void) {
     Serial.print("Connected to WiFi network with IP Address: ");
     Serial.println(WiFi.localIP());
  
-  delay(1500);
+  delay(100);
   GET_RQ();
-
-//// Normally Open configuration, send LOW signal to let current flow
-//// (if you're usong Normally Closed configuration send HIGH signal)
-//
-//digitalWrite(relay, LOW);
-//Serial.println("Current Flowing");
-//delay(5000); 
-//
-//// Normally Open configuration, send HIGH signal stop current flow
-//// (if you're usong Normally Closed configuration send LOW signal)
-//digitalWrite(relay, HIGH);
-//Serial.println("Current not Flowing");
-//delay(5000);
+  
 }
 String serverName = "http://192.168.137.1/iotinhtdocs/midsemproject/iotMidsemProject/Project_uche.php?"; 
 void GET_RQ(){
@@ -235,5 +247,9 @@ void GET_RQ(){
       Serial.println("WiFi Disconnected");
     }
   
-  delay(500);
+ delay(500);
+ Serial.println("Going to sleep now"); 
+ //delay(2000);
+  Serial.flush();                             
+  esp_deep_sleep_start(); 
  }

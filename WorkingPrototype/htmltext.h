@@ -8,6 +8,21 @@ char page[] PROGMEM = R"(
   .btn {font-size:20px; color:black; text-decoration:none}
     .on {background-color:red}
     .off {background-color:blue}
+
+  .btn {
+  border: 2px solid black;
+  background-color: white;
+  color: black;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Green */
+.success {
+  border-color: #04AA6D;
+  color: green;
+}
   
     </style>
 </head>
@@ -28,18 +43,30 @@ char page[] PROGMEM = R"(
      onclick = 'sendData(id)'>Press to enter manual operation
      </button></td>
      
-  <td><button class = 'btn off' id='Red LED'
+  <td><button class = 'btn off' id='Motor'
      onclick = 'sendData(id)'>Press to turn MOTOR ON
      </button></td>
 
+  <button class= 'btn success' onclick= 'updateByAJAX_Current()'> Tank1 level</button>
+   <div id='Current'></div>
      
 </tr></table>
 <script> 
 
+function updateByAJAX_Current(){
+      const xhttp=new XMLHttpRequest();
+      xhttp.onload=function(){
+        document.getElementById("Current").innerText=this.responseText;
+      }
+      
+      xhttp.open("GET", "http://localhost/iotinhtdocs/midsemproject/iotMidsemProject/getlastTank1.php?");
+      xhttp.send();
+}
+
 function sendData(butn)
 {
   var URL, variab, text;
-  if(butn == 'Red LED')
+  if(butn == 'Motor')
   {
     URL = 'LEDRurl';
     variab = 'LEDR';
@@ -53,7 +80,7 @@ function sendData(butn)
  }
 
 
-  if(butn == 'Red LED')
+  if(butn == 'Motor')  
 { // change button class and text 
   var state = document.getElementById(butn).className;
   state = (state == 'btn on' ? 'btn off' : 'btn on');
